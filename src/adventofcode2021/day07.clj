@@ -18,7 +18,7 @@
         cnt (count sorted)
         halfway (quot cnt 2)]
     (if (odd? cnt)
-      (nth sorted halfway) ; (1)
+      (nth sorted halfway)
       (let [bottom (dec halfway)
             bottom-val (nth sorted bottom)
             top-val (nth sorted halfway)]
@@ -27,11 +27,13 @@
 (defn pos-cost [input pos]
   (->> input
        (mapv #(- pos %))
-       (mapv #(Math/abs %))
+       (mapv #(Math/abs ^long %))
        (reduce +)))
 
 (defn pos-cost2 [input pos]
-  (let [cost (fn [x] (reduce + (range 1 (inc (Math/abs (- x pos))))))]
+  (let [cost (fn [x]
+               (let [diff (Math/abs ^long (- x pos))]
+                 (quot (* diff (inc diff)) 2)))]
     (->> input
          (mapv cost)
          (reduce +))))
