@@ -6,6 +6,24 @@
                (str/split #",")
                (->> (mapv (comp #(Long/parseLong %) str/trim)))))
 
+(defn mean [coll]
+  (let [sum (apply + coll)
+        count (count coll)]
+    (if (pos? count)
+      (int (/ sum count))
+      0)))
+
+(defn median [coll]
+  (let [sorted (sort coll)
+        cnt (count sorted)
+        halfway (quot cnt 2)]
+    (if (odd? cnt)
+      (nth sorted halfway) ; (1)
+      (let [bottom (dec halfway)
+            bottom-val (nth sorted bottom)
+            top-val (nth sorted halfway)]
+        (mean [bottom-val top-val])))))
+
 (defn pos-cost [input pos]
   (->> input
        (mapv #(- pos %))
@@ -18,22 +36,13 @@
          (mapv cost)
          (reduce +))))
 
-(defn min-cost [input cost-fn]
-  (let [low   (apply min input)
-        hi    (apply max input)
-        avg   (int (/ (reduce + input) (count input)))
-        poses (mapcat vector (range avg low -1) (range (inc avg) hi))]
-    (->> poses
-         (mapv (partial cost-fn input))
-         (apply min))))
-
 (comment
   ;;part 1
-  (min-cost input pos-cost)
+  (pos-cost input (median input))
   ;; => 343605
 
   ;;part 2
-  (min-cost input pos-cost2)
+  (pos-cost2 input (mean input))
   ;; => 96744904
 
   )
